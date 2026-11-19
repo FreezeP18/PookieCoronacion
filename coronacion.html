@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Coronación de Su Alteza Pookie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --plum:#1e0a22; --plum2:#3d1340; --plum3:#5a1d5c;
+    --velvet:#6e1636; --velvet2:#3e0a1e;
+    --rose:#f2b5c8; --rose2:#c9708f;
+    --gold:#e8c26a; --gold-hi:#fbe7a6; --gold2:#b8862f; --gold3:#7d5718;
+    --cream:#fbf3e4; --parch:#f8ecd2; --ink:#3b2416; --wine:#7a1f45;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:'Cormorant Garamond',serif; color:var(--cream);
+    background:
+      radial-gradient(ellipse 70% 45% at 50% 0%,rgba(232,194,106,.18),transparent 70%),
+      radial-gradient(ellipse at 50% 30%,var(--plum3),var(--plum2) 45%,var(--plum) 85%);
+    background-attachment:fixed;
+    min-height:100vh; overflow-x:hidden; text-align:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* Patrón damasco sutil */
+  body:before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.07;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 6 L36 24 L54 30 L36 36 L30 54 L24 36 L6 30 L24 24 Z' fill='none' stroke='%23e8c26a' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23e8c26a'/%3E%3C/svg%3E");
+  }
+  /* Viñeta */
+  body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55))}
+
+  canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .stars span{position:absolute;border-radius:50%;background:#fff;opacity:.6;animation:tw 4s infinite ease-in-out}
+  @keyframes tw{0%,100%{opacity:.1}50%{opacity:.85}}
+
+  /* Escenario: cortinas y cenefa */
+  .curtain{
+    position:fixed;top:0;bottom:0;width:clamp(26px,10vw,140px);z-index:3;pointer-events:none;
+    background:
+      linear-gradient(90deg,rgba(0,0,0,.35),transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%,rgba(0,0,0,.35)) 0 0/22px 100%,
+      linear-gradient(180deg,var(--velvet),var(--velvet2));
+    filter:drop-shadow(0 0 18px rgba(0,0,0,.6));
+  }
+  .curtain.l{left:0;clip-path:polygon(0 0,100% 0,92% 30%,45% 58%,70% 100%,0 100%)}
+  .curtain.r{right:0;clip-path:polygon(0 0,100% 0,100% 100%,30% 100%,55% 58%,8% 30%)}
+  .valance{
+    position:fixed;top:0;left:0;right:0;height:42px;z-index:4;pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 100% at 50% 0,var(--velvet) 0 88%,var(--gold) 89% 97%,transparent 98%) 0 0/84px 42px repeat-x;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.55));
+  }
+  .valance:before{content:"";position:absolute;left:0;right:0;top:0;height:10px;background:linear-gradient(180deg,var(--velvet2),var(--velvet));border-bottom:2px solid var(--gold2)}
+
+  .screen{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:72px 18px 44px}
+  .screen.on{display:flex;animation:fade .9s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  h1,.deco{font-family:'Cinzel Decorative',serif;color:var(--gold);letter-spacing:1px}
+  h1{
+    font-size:clamp(26px,7vw,44px);line-height:1.18;
+    background:linear-gradient(180deg,var(--gold-hi),var(--gold) 50%,var(--gold2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 2px 14px rgba(232,194,106,.35));
+  }
+  .kick{font-style:italic;font-size:19px;color:var(--rose)}
+  .sub{font-size:clamp(18px,4.6vw,23px);font-style:italic;opacity:.92;margin:16px auto 30px;max-width:460px;line-height:1.45}
+  .script{font-family:'Great Vibes',cursive}
+
+  .flourish{display:block;width:min(240px,70%);height:20px;margin:14px auto;color:var(--gold)}
+
+  /* Botones */
+  .btn{
+    position:relative;overflow:hidden;
+    font-family:'Cinzel Decorative',serif;font-weight:700;font-size:16px;letter-spacing:.5px;
+    color:var(--plum);background:linear-gradient(180deg,var(--gold-hi),var(--gold) 50%,var(--gold2));
+    border:1px solid var(--gold3);border-radius:40px;padding:15px 34px;cursor:pointer;
+    box-shadow:0 6px 24px rgba(232,194,106,.35),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(0,0,0,.15);
+    transition:transform .15s,box-shadow .2s;
+  }
+  .btn:hover{box-shadow:0 8px 32px rgba(232,194,106,.55),inset 0 1px 0 rgba(255,255,255,.7)}
+  .btn:active{transform:scale(.96)}
+  .btn:focus-visible{outline:2px solid var(--rose);outline-offset:4px}
+  .btn.ghost{background:transparent;color:var(--gold);border:1.5px solid rgba(232,194,106,.7);box-shadow:none;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;padding:9px 22px}
+  .btn.ghost:hover{background:rgba(232,194,106,.1)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+
+  /* Esquinas ornamentales */
+  .corners svg{position:absolute;width:46px;height:46px;color:var(--gold);pointer-events:none}
+  .corners .c1{top:8px;left:8px}
+  .corners .c2{top:8px;right:8px;transform:scaleX(-1)}
+  .corners .c3{bottom:8px;left:8px;transform:scaleY(-1)}
+  .corners .c4{bottom:8px;right:8px;transform:scale(-1,-1)}
+
+  /* 1. Invitación */
+  .panel{
+    position:relative;max-width:540px;width:100%;padding:46px 30px 40px;
+    background:linear-gradient(180deg,rgba(61,19,64,.75),rgba(30,10,34,.8));
+    border:1px solid rgba(232,194,106,.55);border-radius:4px;
+    box-shadow:0 0 0 6px rgba(30,10,34,.6),0 0 0 7px rgba(232,194,106,.3),0 20px 60px rgba(0,0,0,.55);
+    backdrop-filter:blur(4px);
+  }
+  .seal{width:96px;height:96px;margin:0 auto 16px;display:block;transform:rotate(-6deg);filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+  .hint{margin-top:18px;font-size:14px;opacity:.6;font-style:italic}
+
+  /* 2. Proclamación */
+  .herald{position:relative;width:96px;height:96px;margin:0 auto 10px}
+  .herald .portrait{
+    width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;
+    background:radial-gradient(circle at 40% 35%,#7a2b6e,var(--plum2));
+    border:3px solid var(--gold);box-shadow:0 0 0 4px rgba(232,194,106,.2),0 8px 20px rgba(0,0,0,.5);
+  }
+  .herald .tr{position:absolute;right:-30px;top:4px;font-size:38px;display:inline-block;transform-origin:20% 80%;animation:toot 1s ease-in-out infinite}
+  @keyframes toot{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(8deg)}}
+  .herald-name{font-style:italic;font-size:18px;color:var(--rose);margin:8px 0 34px}
+
+  .scroll-wrap{position:relative;max-width:520px;width:100%;padding:0 6px}
+  .rod{
+    position:relative;height:20px;margin:0 -10px;border-radius:10px;z-index:2;
+    background:linear-gradient(180deg,#d9a85a,#8a5f22 55%,#5e3d12);
+    box-shadow:0 4px 8px rgba(0,0,0,.45);
+  }
+  .rod:before,.rod:after{content:"";position:absolute;top:-4px;width:20px;height:28px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--gold-hi),var(--gold2) 60%,var(--gold3));box-shadow:0 3px 6px rgba(0,0,0,.4)}
+  .rod:before{left:-12px}.rod:after{right:-12px}
+  .scroll{
+    position:relative;color:var(--ink);margin:-6px 0;
+    background:
+      radial-gradient(ellipse at center,transparent 55%,rgba(150,100,40,.28) 100%),
+      linear-gradient(180deg,#e9d4a6,#fbf1dc 12%,#fdf6e6 50%,#fbf1dc 88%,#e9d4a6);
+    padding:40px 30px;min-height:230px;
+    display:flex;flex-direction:column;justify-content:center;
+    box-shadow:0 14px 40px rgba(0,0,0,.5);
+  }
+  .scroll .lead{font-family:'Cinzel Decorative',serif;font-weight:700;font-size:16px;color:var(--wine);letter-spacing:1px}
+  .scroll .flourish{color:var(--gold2);margin:10px auto 16px;width:180px}
+  .scroll p{font-size:clamp(19px,4.8vw,23px);line-height:1.5}
+  .scroll .anim{animation:fade .7s ease}
+
+  .dots{margin:28px 0 22px;display:flex;gap:12px;justify-content:center}
+  .dots i{width:9px;height:9px;transform:rotate(45deg);border:1px solid var(--gold);background:transparent;transition:all .3s}
+  .dots i.on{background:var(--gold);box-shadow:0 0 10px rgba(232,194,106,.7)}
+
+  /* 3. Coronación */
+  .stage{position:relative;width:280px;height:320px;margin:0 auto 18px}
+  .rays{
+    position:absolute;left:50%;top:55%;width:620px;height:620px;margin:-310px 0 0 -310px;pointer-events:none;
+    background:repeating-conic-gradient(from 0deg,rgba(232,194,106,.22) 0 5deg,transparent 5deg 15deg);
+    -webkit-mask:radial-gradient(circle,#000 15%,transparent 62%);mask:radial-gradient(circle,#000 15%,transparent 62%);
+    opacity:0;animation:spin 60s linear infinite;transition:opacity 1.5s;
+  }
+  .stage.lit .rays{opacity:1}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .throne{position:absolute;inset:0;width:100%;height:100%}
+  .crown{position:absolute;left:50%;top:-220px;width:124px;transform:translateX(-50%);opacity:0;z-index:3;filter:drop-shadow(0 6px 14px rgba(232,194,106,.6))}
+  .crown.drop{animation:drop 1.8s cubic-bezier(.3,1.4,.5,1) forwards}
+  @keyframes drop{0%{top:-220px;opacity:0;transform:translateX(-50%) rotate(-20deg)}55%{opacity:1}100%{top:30px;opacity:1;transform:translateX(-50%) rotate(-6deg)}}
+  .medal{
+    position:absolute;left:50%;bottom:58px;transform:translateX(-50%);z-index:2;
+    width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#ffe3ec,var(--rose) 45%,var(--rose2));
+    border:5px solid var(--gold);box-shadow:0 0 0 6px rgba(232,194,106,.25),0 0 50px rgba(242,181,200,.45),inset 0 -6px 14px rgba(120,30,70,.3);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+  }
+  .medal:before{content:"";position:absolute;inset:8px;border-radius:50%;border:1.5px dashed rgba(122,31,69,.45)}
+  .medal .script{font-size:50px;color:var(--plum2);line-height:1}
+  .medal small{font-style:italic;font-weight:600;color:var(--wine);font-size:15px;margin-top:4px}
+  .glow{animation:glow 2s ease-in-out infinite}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 6px rgba(232,194,106,.25),0 0 40px rgba(242,181,200,.4)}50%{box-shadow:0 0 0 12px rgba(232,194,106,.45),0 0 90px rgba(232,194,106,.75)}}
+  .vow{font-size:clamp(20px,5vw,24px);font-style:italic;max-width:440px;margin-bottom:24px;min-height:64px;line-height:1.4}
+  .vow b{font-family:'Cinzel Decorative',serif;font-style:normal;color:var(--gold);font-size:.9em}
+  .spark{position:fixed;z-index:60;color:var(--gold-hi);font-size:16px;pointer-events:none;transform:translate(-50%,-50%);text-shadow:0 0 8px var(--gold);animation:spark 1.1s ease-out forwards}
+  @keyframes spark{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3) rotate(180deg);opacity:0}}
+
+  /* 4. Certificado */
+  .cert{
+    position:relative;max-width:580px;width:100%;padding:52px 34px 40px;color:var(--ink);
+    background:
+      radial-gradient(ellipse at center,transparent 60%,rgba(184,134,47,.18) 100%),
+      linear-gradient(180deg,#fffaf0,var(--parch));
+    border-radius:3px;
+    box-shadow:0 18px 60px rgba(0,0,0,.55);
+  }
+  .cert:before{content:"";position:absolute;inset:12px;border:2px solid var(--gold2);pointer-events:none}
+  .cert:after{content:"";position:absolute;inset:18px;border:1px solid rgba(184,134,47,.5);pointer-events:none}
+  .cert .corners svg{color:var(--gold2);width:52px;height:52px}
+  .cert .corners .c1{top:14px;left:14px}.cert .corners .c2{top:14px;right:14px}
+  .cert .corners .c3{bottom:14px;left:14px}.cert .corners .c4{bottom:14px;right:14px}
+  .crest{width:64px;height:48px;margin:0 auto 8px;display:block}
+  .cert .kicker{font-style:italic;font-size:18px;color:#8a6a3a}
+  .cert h2{font-family:'Cinzel Decorative',serif;font-weight:700;font-size:clamp(19px,5vw,26px);color:var(--wine);margin:8px 0 0}
+  .cert .flourish{color:var(--gold2);margin:12px auto}
+  .cert .certifies{font-style:italic;font-size:17px;color:#7a5a3a}
+  .cert .name{font-family:'Great Vibes',cursive;font-size:clamp(50px,14vw,72px);color:var(--plum2);margin:4px 0 0;line-height:1.05}
+  .cert .alias{font-style:italic;font-size:19px;color:#7a5a3a;margin-bottom:16px}
+  .cert .body{font-size:18px;line-height:1.5;margin:0 auto 16px;max-width:440px}
+  .ribbon{
+    display:inline-block;position:relative;margin:4px 0 22px;padding:10px 38px;
+    font-family:'Cinzel Decorative',serif;font-weight:700;font-size:clamp(14px,4vw,19px);letter-spacing:.5px;color:var(--cream);
+    background:linear-gradient(180deg,#9a2c5a,var(--wine) 60%,#5c1534);
+    clip-path:polygon(0 0,100% 0,calc(100% - 16px) 50%,100% 100%,0 100%,16px 50%);
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));
+  }
+  .cert ul{list-style:none;text-align:left;max-width:420px;margin:0 auto 22px;font-size:17px;line-height:1.45}
+  .cert li{padding:6px 0 6px 28px;position:relative;border-bottom:1px dotted rgba(184,134,47,.45)}
+  .cert li:last-child{border-bottom:none;font-weight:600;color:var(--wine)}
+  .cert li:before{content:"♛";position:absolute;left:2px;top:6px;color:var(--gold2)}
+  .cert .date{font-size:16px;font-style:italic;color:#7a5a3a;margin-bottom:26px}
+  .sigs{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:12px;position:relative;z-index:2}
+  .sig .s{font-family:'Great Vibes',cursive;font-size:34px;color:#2d2a6b;border-bottom:1px solid #8a6a3a;padding-bottom:2px;min-height:48px;display:flex;align-items:flex-end;justify-content:center}
+  .sig .paw{font-size:28px;border-bottom:1px solid #8a6a3a;min-height:48px;display:flex;align-items:center;justify-content:center}
+  .sig .paw span{display:inline-block;transform:rotate(-14deg)}
+  .sig .r{font-size:13px;margin-top:6px;color:#6a4a2a;line-height:1.3}
+  .wax-wrap{position:relative;width:84px;height:100px;margin-bottom:-6px}
+  .wax-wrap:before,.wax-wrap:after{
+    content:"";position:absolute;top:56px;width:18px;height:44px;background:linear-gradient(180deg,#9c1d44,#6e0f2d);
+    clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);transform-origin:top center;opacity:0;transition:opacity .3s .9s;
+  }
+  .wax-wrap:before{left:22px;transform:rotate(14deg)}
+  .wax-wrap:after{right:22px;transform:rotate(-14deg)}
+  .wax-wrap.on:before,.wax-wrap.on:after{opacity:1}
+  .wax{
+    position:absolute;left:3px;top:0;width:78px;height:78px;border-radius:50%;z-index:1;
+    background:radial-gradient(circle at 35% 30%,#d4476e,#9c1d44 60%,#6e0f2d);
+    box-shadow:0 4px 10px rgba(0,0,0,.35),inset 0 -3px 6px rgba(0,0,0,.3),inset 0 2px 3px rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;color:#f7c9d6;font-family:'Great Vibes',cursive;font-size:36px;
+    transform:scale(0) rotate(-30deg);opacity:.96;
+  }
+  .wax:before{content:"";position:absolute;inset:7px;border-radius:50%;border:1.5px solid rgba(247,201,214,.45)}
+  .wax.stamp{animation:stamp .6s cubic-bezier(.3,1.6,.5,1) forwards .6s}
+  @keyframes stamp{to{transform:scale(1) rotate(-12deg)}}
+  .footer{margin-top:28px;font-size:clamp(26px,7vw,34px);max-width:480px;line-height:1.25;color:var(--rose)}
+
+  @media (max-width:420px){
+    .panel{padding:42px 22px 34px}
+    .scroll{padding:34px 22px}
+    .cert{padding:50px 24px 36px}
+    .sigs{gap:6px}
+    .sig .s{font-size:28px}
+    .stage{transform:scale(.92);margin-top:-10px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+  }
+  @media print{
+    @page{margin:10mm}
+    body{background:#fff}
+    body:before,body:after,.curtain,.valance,.stars,canvas,.screen:not(#s4),.footer,.actions{display:none!important}
+    #s4{display:flex!important;min-height:auto;padding:0}
+    .cert{box-shadow:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wax{transform:scale(1) rotate(-12deg)}
+    .wax-wrap:before,.wax-wrap:after{opacity:1}
+  }
+</style>
+</head>
+<body>
+
+<!-- Símbolos reutilizables -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe7a6"/><stop offset=".55" stop-color="#e8c26a"/><stop offset="1" stop-color="#a87526"/></linearGradient>
+    <linearGradient id="velvet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3e0a1e"/><stop offset=".5" stop-color="#8a1f48"/><stop offset="1" stop-color="#3e0a1e"/></linearGradient>
+    <radialGradient id="waxg" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#d4476e"/><stop offset=".6" stop-color="#9c1d44"/><stop offset="1" stop-color="#6e0f2d"/></radialGradient>
+    <symbol id="crownSym" viewBox="0 0 120 90">
+      <path d="M8 70 L4 22 L32 46 L60 8 L88 46 L116 22 L112 70 Z" fill="url(#g)" stroke="#8a5f22" stroke-width="2"/>
+      <rect x="8" y="68" width="104" height="16" rx="3" fill="url(#g)" stroke="#8a5f22" stroke-width="2"/>
+      <circle cx="4" cy="22" r="5" fill="#f2b5c8"/><circle cx="60" cy="8" r="6" fill="#f2b5c8"/><circle cx="116" cy="22" r="5" fill="#f2b5c8"/>
+      <circle cx="35" cy="76" r="4" fill="#d4476e"/><circle cx="60" cy="76" r="5" fill="#6fb3e0"/><circle cx="85" cy="76" r="4" fill="#d4476e"/>
+      <path d="M60 30 l5 10 -5 10 -5 -10z" fill="#d4476e"/>
+    </symbol>
+    <symbol id="flourishSym" viewBox="0 0 240 20">
+      <g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+        <path d="M14 10 H96"/><path d="M144 10 H226"/>
+        <path d="M96 10 q6 -7 12 0 q-6 7 -12 0"/><path d="M144 10 q-6 -7 -12 0 q6 7 12 0"/>
+      </g>
+      <path d="M120 2 l8 8 -8 8 -8 -8z" fill="currentColor"/>
+      <circle cx="10" cy="10" r="2" fill="currentColor"/><circle cx="230" cy="10" r="2" fill="currentColor"/>
+    </symbol>
+    <symbol id="cornerSym" viewBox="0 0 60 60">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M3 57 V16 Q3 3 16 3 H57" stroke-width="1.6"/>
+        <path d="M10 50 V22 Q10 10 22 10 H50" stroke-width="1"/>
+        <path d="M18 30 Q18 18 30 18" stroke-width="1"/>
+      </g>
+      <path d="M16 9 l4 4 -4 4 -4 -4z" fill="currentColor" transform="translate(0 3)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stars" id="stars"></div>
+<div class="curtain l"></div><div class="curtain r"></div><div class="valance"></div>
+<canvas id="confetti"></canvas>
+
+<!-- 1. Invitación -->
+<section class="screen on" id="s1">
+  <div class="panel">
+    <div class="corners"><svg class="c1"><use href="#cornerSym"/></svg><svg class="c2"><use href="#cornerSym"/></svg><svg class="c3"><use href="#cornerSym"/></svg><svg class="c4"><use href="#cornerSym"/></svg></div>
+    <svg class="seal" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M50 4 C62 6 66 2 74 10 C84 14 88 20 92 30 C98 40 94 46 96 54 C96 66 92 72 86 80 C80 90 70 92 60 96 C50 98 44 94 34 94 C24 90 16 86 10 76 C4 66 6 60 4 50 C4 38 8 30 14 22 C22 12 30 8 38 6 C44 4 46 4 50 4Z" fill="url(#waxg)"/>
+      <circle cx="50" cy="50" r="34" fill="none" stroke="#f7c9d6" stroke-opacity=".5" stroke-width="1.5"/>
+      <use href="#crownSym" x="28" y="32" width="44" height="34"/>
+    </svg>
+    <p class="kick">Día de la Princecita Pookie, 18 de noviembre</p>
+    <svg class="flourish" aria-hidden="true"><use href="#flourishSym"/></svg>
+    <h1>Su Alteza ha sido convocada</h1>
+    <p class="sub">El Reino Pookil solicita la presencia de la Princesa Pookie para una ceremonia de suma importancia.</p>
+    <button class="btn" id="enter">Entrar al salón</button>
+    <p class="hint">(ponle volumen para el sazon y regueton)</p>
+  </div>
+</section>
+
+<!-- 2. Proclamación -->
+<section class="screen" id="s2">
+  <div class="herald"><div class="portrait">🐕</div><span class="tr">🎺</span></div>
+  <div class="herald-name">Sir Pipza, caballero real</div>
+  <div class="scroll-wrap">
+    <div class="rod"></div>
+    <div class="scroll">
+      <div id="decreeBox">
+        <div class="lead" id="lead">Proclamación Real</div>
+        <svg class="flourish" aria-hidden="true"><use href="#flourishSym"/></svg>
+        <p id="decree"></p>
+      </div>
+    </div>
+    <div class="rod"></div>
+  </div>
+  <div class="dots" id="dots"></div>
+  <button class="btn" id="next">Continuar</button>
+</section>
+
+<!-- 3. Coronación -->
+<section class="screen" id="s3">
+  <div class="stage" id="stage">
+    <div class="rays"></div>
+    <svg class="throne" viewBox="0 0 280 320" aria-hidden="true">
+      <!-- respaldo -->
+      <path d="M50 290 V120 Q50 26 140 18 Q230 26 230 120 V290 Z" fill="url(#velvet)" stroke="url(#g)" stroke-width="6"/>
+      <path d="M66 280 V124 Q66 44 140 36 Q214 44 214 124 V280" fill="none" stroke="#e8c26a" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="2 5"/>
+      <circle cx="140" cy="14" r="9" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <circle cx="50" cy="118" r="8" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <circle cx="230" cy="118" r="8" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <!-- brazos -->
+      <rect x="20" y="210" width="50" height="22" rx="10" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <rect x="210" y="210" width="50" height="22" rx="10" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <rect x="28" y="230" width="14" height="76" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <rect x="238" y="230" width="14" height="76" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+      <!-- asiento -->
+      <rect x="40" y="262" width="200" height="30" rx="14" fill="#8a1f48" stroke="url(#g)" stroke-width="4"/>
+      <rect x="54" y="292" width="172" height="16" rx="4" fill="url(#g)" stroke="#8a5f22" stroke-width="1.5"/>
+    </svg>
+    <svg class="crown" id="crown" viewBox="0 0 120 90" aria-hidden="true"><use href="#crownSym"/></svg>
+    <div class="medal" id="medal"><div class="script">Pookie</div><small>Su Alteza</small></div>
+  </div>
+  <p class="vow" id="vow">¿Acepta Su Alteza la Corona del Reino Pookil, con todos sus privilegios y chineos?</p>
+  <button class="btn" id="accept">Acepto la corona</button>
+</section>
+
+<!-- 4. Certificado -->
+<section class="screen" id="s4">
+  <div class="cert">
+    <div class="corners"><svg class="c1"><use href="#cornerSym"/></svg><svg class="c2"><use href="#cornerSym"/></svg><svg class="c3"><use href="#cornerSym"/></svg><svg class="c4"><use href="#cornerSym"/></svg></div>
+    <svg class="crest" viewBox="0 0 120 90" aria-hidden="true"><use href="#crownSym"/></svg>
+    <div class="kicker">Certificado oficial de coronación</div>
+    <h2>Reino Pookil</h2>
+    <svg class="flourish" aria-hidden="true"><use href="#flourishSym"/></svg>
+    <p class="certifies">Se certifica que</p>
+    <div class="name">Jimenita Pookie</div>
+    <div class="alias">“Pookie ling ling”</div>
+    <p class="body">Habiendo demostrado belleza, inteligencia, un corazon hermoso y nindo y una paciencia infinita, por el presente queda proclamada</p>
+    <div class="ribbon">Princesa Pookie Vitalicia del Reino Pookil</div>
+    <ul>
+      <li>Derecho a mimir con pookie, sin previo aviso</li>
+      <li>Vivir toda la vida con Pookie</li>
+      <li>Abrazos infinitos, 24/7, sin costo de envío</li>
+      <li>Comidita (sin gluten)</li>
+      <li>Muchos Pookie planes</li>
+      <li>Ser amada todos los días ❤️.</li>
+    </ul>
+    <div class="date">Dado en el pookie reino, a los 18 días de noviembre de 2026</div>
+    <div class="sigs">
+      <div class="sig"><div class="s">Sebas</div><div class="r">su principe pookie<br>y novio</div></div>
+      <div class="wax-wrap" id="waxWrap"><div class="wax" id="wax">S</div></div>
+      <div class="sig"><div class="paw"><span>🐾</span></div><div class="r">Sir Pipza<br>Cabalero Real</div></div>
+    </div>
+  </div>
+  <p class="footer script">Feliz Día de la Princesa, mi amor. Para mí lo sos todos los días. 💗</p>
+  <div class="actions">
+    <button class="btn ghost" id="again">Celebrar otra vez 🎉</button>
+    <button class="btn ghost" id="print">Guardar certificado</button>
+  </div>
+</section>
+
+<script>
+// Estrellas
+(function(){const s=document.getElementById('stars');for(let i=0;i<70;i++){const e=document.createElement('span');e.style.left=Math.random()*100+'%';e.style.top=Math.random()*100+'%';e.style.animationDelay=(Math.random()*3)+'s';e.style.animationDuration=(2+Math.random()*3)+'s';const z=Math.random()*2+1;e.style.width=e.style.height=z+'px';s.appendChild(e)}})();
+
+// Audio (fanfarria sintetizada)
+let ctx=null;
+function ac(){try{if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}catch(e){return null}}
+function tone(f,t0,d,vol=0.12,type='sawtooth'){
+  const c=ac();if(!c)return;
+  const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+  o.type=type;o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2200;
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+0.02);
+  g.gain.setValueAtTime(vol,t0+d*0.7);g.gain.exponentialRampToValueAtTime(0.0001,t0+d);
+  o.connect(lp);lp.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+d+0.05);
+}
+function fanfare(big){
+  const c=ac();if(!c)return;let t=c.currentTime+0.05;
+  const seq=big
+    ?[[392,.16],[392,.16],[392,.16],[523,.5],[0,.08],[466,.16],[523,.16],[659,.3],[523,.16],[659,.16],[784,1.2]]
+    :[[392,.15],[392,.15],[392,.15],[523,.7]];
+  seq.forEach(([f,d])=>{if(f){tone(f,t,d);tone(f/2,t,d,0.05,'square')}t+=d});
+}
+function chime(){const c=ac();if(!c)return;const t=c.currentTime;[1047,1319,1568,2093].forEach((f,i)=>tone(f,t+i*0.09,0.6,0.06,'sine'))}
+
+// Confeti
+const cv=document.getElementById('confetti'),cx=cv.getContext('2d');let parts=[],raf=null;
+function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+size();addEventListener('resize',size);
+function confetti(n=180){
+  const cols=['#e8c26a','#f2b5c8','#fff','#d4476e','#fbe7a6','#c9a0dc'];
+  for(let i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*120,y:innerHeight*0.35,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,s:Math.random()*7+4,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.3,life:0,shape:Math.random()<.15?'heart':'rect'});
+  if(!raf)loop();
+}
+function heart(x,y,s){cx.beginPath();cx.moveTo(x,y+s/4);cx.bezierCurveTo(x,y,x-s/2,y,x-s/2,y+s/4);cx.bezierCurveTo(x-s/2,y+s/2,x,y+s*.75,x,y+s);cx.bezierCurveTo(x,y+s*.75,x+s/2,y+s/2,x+s/2,y+s/4);cx.bezierCurveTo(x+s/2,y,x,y,x,y+s/4);cx.fill()}
+function loop(){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{p.vy+=.32;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life++;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;
+    if(p.shape==='heart')heart(0,-p.s/2,p.s*1.6);else cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()});
+  parts=parts.filter(p=>p.y<innerHeight+40);
+  raf=parts.length?requestAnimationFrame(loop):null;
+}
+
+// Destellos
+function sparkle(el,n=16){
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<n;i++){
+    const s=document.createElement('span');s.className='spark';s.textContent=Math.random()<.5?'✦':'✧';
+    s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height/2)+'px';
+    const a=Math.random()*Math.PI*2,d=60+Math.random()*90;
+    s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');
+    s.style.fontSize=(10+Math.random()*12)+'px';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1200);
+  }
+}
+
+// Navegación
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');scrollTo(0,0)}
+
+const decrees=[
+  ["¿Y por qué vos?","Porque no necesito grandes aventuras para pasarla increíble, me basta con tenerte a mi lado. Porque hasta los planes más sencillos se vuelven mis recuerdos favoritos cuando son con vos. Porque admiro muchísimo la mujer que sos, tu inteligencia, tu corazón y todo lo que sos capaz de lograr. Y porque, aunque Sir Pipza haga todo lo posible por destruir la paz del reino, no cambiaría nuestra pequeña familia por nada."]
+];
+let di=0;
+const dots=document.getElementById('dots');decrees.forEach(()=>dots.appendChild(document.createElement('i')));
+function renderDecree(){
+  const [l,t]=decrees[di];
+  const box=document.getElementById('decreeBox');box.classList.remove('anim');void box.offsetWidth;
+  document.getElementById('lead').textContent=l;document.getElementById('decree').textContent=t;box.classList.add('anim');
+  [...dots.children].forEach((d,i)=>d.classList.toggle('on',i<=di));
+  document.getElementById('next').textContent=di===decrees.length-1?'Proceder a la coronación 👑':'Continuar';
+}
+document.getElementById('enter').onclick=()=>{fanfare(false);show('s2');di=0;renderDecree()};
+document.getElementById('next').onclick=()=>{
+  chime();
+  if(di<decrees.length-1){di++;renderDecree()}
+  else{show('s3')}
+};
+document.getElementById('accept').onclick=function(){
+  this.style.display='none';
+  const cr=document.getElementById('crown');cr.classList.remove('drop');void cr.offsetWidth;cr.classList.add('drop');
+  document.getElementById('vow').textContent='Por el poder conferido por el amor de este reino…';
+  setTimeout(()=>{
+    fanfare(true);confetti(220);sparkle(cr,20);
+    document.getElementById('stage').classList.add('lit');
+    document.getElementById('medal').classList.add('glow');
+    document.getElementById('vow').innerHTML='¡Larga vida a la <b>Princesa Pookie</b>! 👑';
+  },1500);
+  setTimeout(()=>{
+    show('s4');
+    document.getElementById('wax').classList.add('stamp');
+    document.getElementById('waxWrap').classList.add('on');
+    confetti(150);
+  },5200);
+};
+document.getElementById('again').onclick=()=>{fanfare(true);confetti(240);sparkle(document.getElementById('wax'),14)};
+document.getElementById('print').onclick=()=>print();
+</script>
+</body>
+</html>
